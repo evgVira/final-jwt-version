@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+  postgres:
+    container_name: jwt_db
+    image: postgres:15
+    ports:
+      - 127.0.0.1:5434:5432
+    environment:
+      - POSTGRES_DB=jw_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
