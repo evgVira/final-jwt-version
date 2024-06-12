@@ -1,4 +1,4 @@
-package org.mcs.finaljwtversion.security;
+package org.mcs.finaljwtversion.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

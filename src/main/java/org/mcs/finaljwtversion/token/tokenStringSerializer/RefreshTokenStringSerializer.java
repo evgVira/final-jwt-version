@@ -1,30 +1,33 @@
 package org.mcs.finaljwtversion.token.tokenStringSerializer;
 
-import com.nimbusds.jose.*;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mcs.finaljwtversion.token.config.RefreshVerifyConfig;
 import org.mcs.finaljwtversion.token.model.RefreshToken;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
+@Qualifier("refreshConfigBean")
 public class RefreshTokenStringSerializer implements Function<RefreshToken, String> {
 
-    @Value("${jwt.refresh-secret}")
-    private String refreshTokenSecret;
 
-    private final JWSAlgorithm jwsAlgorithm = JWSAlgorithm.HS256;
+    private final RefreshVerifyConfig refreshVerifyConfig;
 
     @Override
     public String apply(RefreshToken refreshToken) {
 
-        JWSHeader jwsHeader = new JWSHeader.Builder(jwsAlgorithm)
+        JWSHeader jwsHeader = new JWSHeader.Builder(refreshVerifyConfig.getJwsAlgorithm())
                 .keyID(refreshToken.getId().toString())
                 .build();
 
@@ -39,7 +42,7 @@ public class RefreshTokenStringSerializer implements Function<RefreshToken, Stri
         SignedJWT signedJWT = new SignedJWT(jwsHeader, jwtClaimsSet);
 
         try {
-            JWSSigner jwsSigner = new MACSigner(cryptRefreshSecret(refreshTokenSecret));
+            JWSSigner jwsSigner = new MACSigner(refreshVerifyConfig.cryptSecret());
 
             signedJWT.sign(jwsSigner);
 
@@ -50,14 +53,5 @@ public class RefreshTokenStringSerializer implements Function<RefreshToken, Stri
             log.error(exception.getMessage());
         }
         return null;
-    }
-
-    private String cryptRefreshSecret(String refreshTokenSecret) throws JOSEException {
-
-        return new OctetSequenceKeyGenerator(256)
-                .keyID(refreshTokenSecret)
-                .algorithm(jwsAlgorithm)
-                .generate()
-                .toJSONString();
     }
 }

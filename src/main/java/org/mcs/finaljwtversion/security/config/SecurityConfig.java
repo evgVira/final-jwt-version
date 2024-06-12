@@ -1,5 +1,6 @@
-package org.mcs.finaljwtversion.security;
+package org.mcs.finaljwtversion.security.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -12,15 +13,19 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationConfigurer jwtAuthenticationConfigurer;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
+        httpSecurity.apply(jwtAuthenticationConfigurer);
+
         return httpSecurity
                 .httpBasic(Customizer.withDefaults())
                 .cors(CorsConfigurer::disable)
-                .csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/secured").authenticated()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().permitAll())

@@ -13,3 +13,5 @@ spring:
 jwt:
   access-secret: 'some-access-secret'
   refresh-secret: 'some-refresh-secret'
+server:
+  port: 8081

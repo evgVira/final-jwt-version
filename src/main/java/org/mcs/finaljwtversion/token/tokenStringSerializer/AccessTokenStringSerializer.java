@@ -8,8 +8,11 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mcs.finaljwtversion.token.config.AccessVerifyConfig;
 import org.mcs.finaljwtversion.token.model.AccessToken;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +20,17 @@ import java.util.function.Function;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
+@Qualifier("accessConfigBean")
 public class AccessTokenStringSerializer implements Function<AccessToken, String> {
 
-    @Value("${jwt.access-secret}")
-    private String accessTokenSecret;
 
-    private final JWSAlgorithm jwsAlgorithm = JWSAlgorithm.HS256;
+    private final AccessVerifyConfig accessVerifyConfig;
 
     @Override
     public String apply(AccessToken accessToken) {
 
-        JWSHeader jwsHeader = new JWSHeader.Builder(jwsAlgorithm)
+        JWSHeader jwsHeader = new JWSHeader.Builder(accessVerifyConfig.getJwsAlgorithm())
                 .keyID(accessToken.getId().toString())
                 .build();
 
@@ -43,7 +46,7 @@ public class AccessTokenStringSerializer implements Function<AccessToken, String
 
         try {
 
-            JWSSigner jwsSigner = new MACSigner(cryptSecret(accessTokenSecret));
+            JWSSigner jwsSigner = new MACSigner(accessVerifyConfig.cryptSecret());
 
             signedJWT.sign(jwsSigner);
 
@@ -56,11 +59,4 @@ public class AccessTokenStringSerializer implements Function<AccessToken, String
         return null;
     }
 
-    private String cryptSecret(String accessTokenSecret) throws JOSEException {
-        return new OctetSequenceKeyGenerator(256)
-                .keyID(accessTokenSecret)
-                .algorithm(jwsAlgorithm)
-                .generate()
-                .toJSONString();
-    }
 }

@@ -2,6 +2,7 @@ package org.mcs.finaljwtversion.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mcs.finaljwtversion.security.config.PasswordEncoderConfig;
 import org.mcs.finaljwtversion.token.model.AccessToken;
 import org.mcs.finaljwtversion.token.model.RefreshToken;
 import org.mcs.finaljwtversion.token.model.TokenRequestDto;
@@ -11,7 +12,6 @@ import org.mcs.finaljwtversion.token.tokenFactory.RefreshTokenFactory;
 import org.mcs.finaljwtversion.token.tokenStringSerializer.AccessTokenStringSerializer;
 import org.mcs.finaljwtversion.token.tokenStringSerializer.RefreshTokenStringSerializer;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
