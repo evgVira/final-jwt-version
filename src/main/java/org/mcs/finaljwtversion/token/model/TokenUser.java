@@ -1,5 +1,6 @@
 package org.mcs.finaljwtversion.token.model;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
@@ -7,6 +8,7 @@ import java.util.Collection;
 
 public class TokenUser extends User {
 
+    @Getter
     private Token token;
 
     public TokenUser(String username, String password, Collection<? extends GrantedAuthority> authorities, Token token) {
