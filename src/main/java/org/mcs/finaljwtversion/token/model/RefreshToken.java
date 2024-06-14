@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Builder
-public class RefreshToken implements Token{
+public class RefreshToken extends Token{
 
     private UUID id;
     private String subject;

@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Builder
-public class AccessToken implements Token{
+public class AccessToken extends Token{
 
     private UUID id;
 

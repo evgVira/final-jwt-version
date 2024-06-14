@@ -19,3 +19,9 @@ create table if not exists t_user_role
     foreign key (user_id) references t_user(id),
     foreign key (role_id) references t_role(id)
 );
+
+create table t_deactivated_token
+(
+    id uuid primary key,
+    c_keep_until timestamp not null check ( c_keep_until > now() )
+);

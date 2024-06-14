@@ -3,13 +3,16 @@ package org.mcs.finaljwtversion.security.config;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.mcs.finaljwtversion.security.JwtAuthenticationConverter;
+import org.mcs.finaljwtversion.security.LogoutTokenFilter;
 import org.mcs.finaljwtversion.security.RefreshTokenFilter;
 import org.mcs.finaljwtversion.security.UserEntityService;
 import org.mcs.finaljwtversion.token.tokenFactory.AccessTokenFactory;
 import org.mcs.finaljwtversion.token.tokenStringDeserializer.AccessTokenStringDeserializer;
 import org.mcs.finaljwtversion.token.tokenStringDeserializer.RefreshTokenStringDeserializer;
 import org.mcs.finaljwtversion.token.tokenStringSerializer.AccessTokenStringSerializer;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -34,6 +37,8 @@ public class JwtAuthenticationConfigurer extends AbstractHttpConfigurer<JwtAuthe
     private final AccessTokenFactory accessTokenFactory;
 
     private final AccessTokenStringSerializer accessTokenStringSerializer;
+
+    private final JdbcTemplate jdbcTemplate;
 
 
     @Override
@@ -64,10 +69,13 @@ public class JwtAuthenticationConfigurer extends AbstractHttpConfigurer<JwtAuthe
         var authenticationProvider = new PreAuthenticatedAuthenticationProvider();
         authenticationProvider.setPreAuthenticatedUserDetailsService(userEntityService);
 
+        var logoutTokenFilter = new LogoutTokenFilter(jdbcTemplate);
+
+
         builder
                 .addFilterBefore(jwtAuthenticationFilter, CsrfFilter.class)
                 .addFilterBefore(jwtRefreshFilter, ExceptionTranslationFilter.class)
+                .addFilterAfter(logoutTokenFilter, ExceptionTranslationFilter.class)
                 .authenticationProvider(authenticationProvider);
-
     }
 }
